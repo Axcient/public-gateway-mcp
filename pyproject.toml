@@ -7,7 +7,16 @@ authors = [
     { name = "Sam Mosleh", email = "smosleh@axcient.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "mcp>=1.28.1",
+]
+license = "Apache-2.0"
+license-files = [
+    "LICENSE",
+]
+
+[project.scripts]
+public-gateway-mcp = "public_gateway_mcp.server:main"
 
 [build-system]
 requires = ["uv_build>=0.11.26,<0.12.0"]
