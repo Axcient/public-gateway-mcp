@@ -1,7 +1,7 @@
 [project]
 name = "public-gateway-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "An MCP for ax-public-gateway"
 readme = "README.md"
 authors = [
     { name = "Sam Mosleh", email = "smosleh@axcient.com" }
