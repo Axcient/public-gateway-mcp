@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "stop": [
+      {
+        "command": ".cursor/hooks/code-review-trigger.sh",
+        "loop_limit": 3
+      }
+    ]
+  },
+  "version": 1
+}

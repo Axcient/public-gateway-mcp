@@ -1,10 +1,16 @@
+# Environment settings
+.env*
+!.envrc
+
 # Python-generated files
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
 
 # Virtual environments
 .venv
+
+# Coverage reports
+.coverage
+coverage.xml
+
+# Cursor code-review hook state (transient)
+.cursor/hooks/.code-review-state

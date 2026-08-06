@@ -8,11 +8,23 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "mcp>=1.28.1",
+    "fastmcp>=3.4.6",
 ]
 license = "Apache-2.0"
 license-files = [
     "LICENSE",
+]
+
+[dependency-groups]
+dev = [
+    { include-group = "ci" },
+    "ipykernel>=6.30.1",      # Used in notebooks
+]
+ci = [
+    "coverage>=7.10.5",
+    "mypy>=1.17.1",
+    "pytest>=8.4.1",
+    "pytest-randomly>=4.0.1",
 ]
 
 [project.scripts]
@@ -21,3 +33,64 @@ public-gateway-mcp = "public_gateway_mcp.server:main"
 [build-system]
 requires = ["uv_build>=0.11.26,<0.12.0"]
 build-backend = "uv_build"
+
+[tool.mypy]
+strict = true
+plugins = ['pydantic.mypy']
+
+[tool.pytest.ini_options]
+xfail_strict = true
+testpaths = "tests"
+# asyncio_mode = "auto"
+addopts = ["--strict-config", "--strict-markers"]
+markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src", "tests"]
+
+[tool.coverage.report]
+show_missing = true
+partial_branches = [
+    "# pragma: no cover\\b",
+    "# pragma: (nt|posix|cygwin|darwin|linux|msys|win32|cpython|pypy) (no )?cover\\b",
+    "# pragma: (>=?|<=?|==|!=)\\d+\\.\\d+ cover\\b",
+]
+exclude_also = [
+    'case _:\n\s*assert_never\(.*\)',
+    'if __name__ == .__main__.:',
+    'raise$',
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "PL",  # pylint
+    "I",   # isort
+    "C4",  # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "Q",   # flake8-quotes
+    "T20", # flake8-print
+    "S",   # flake8-bandit
+    "PIE", # flake8-pie
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TC",  # flake8-type-checking
+    "C90", # mccabe
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "RUF", # ruff
+]
+ignore = [
+    "E501", # line too long, handled by formatter
+]
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S311"]

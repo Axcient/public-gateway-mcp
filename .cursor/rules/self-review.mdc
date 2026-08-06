@@ -1,0 +1,19 @@
+---
+description: Before finishing any code change, self-review against AGENTS.md rules
+alwaysApply: true
+---
+
+# Mandatory self-review before completing work
+
+Before declaring any code change complete, you MUST:
+
+1. Read `AGENTS.md` and review every rule against your changes
+2. Specifically verify:
+   - **No raw DB access in tests** — all database operations go through `PostgresInteractor`
+   - **Assert full objects** — never assert partial responses (single fields, lengths, filtered projections)
+   - **No re-fetching known values** — don't SELECT values the caller already has; add them in Python
+   - **No `time.sleep`** — never add sleep calls anywhere
+   - **No enumerated variables** — use lists, not `x1`, `x2`
+3. Only after confirming compliance with ALL rules, report the work as done
+
+If any rule is violated, fix it before reporting completion. Do not rely on `just check-all` alone — it checks tooling (lint, types, coverage) but NOT AGENTS.md conventions.

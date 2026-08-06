@@ -1,0 +1,11 @@
+---
+description: Use just recipes only for QA tools; never invoke ruff/pytest/mypy directly
+alwaysApply: true
+---
+
+# Commands: use `just` only
+
+- Do **not** run `ruff`, `uvx ruff`, `pytest`, `mypy`, or similar tools directly (including via `uv run`) for this repo.
+- Use **`just fix`** for automated lint/format/SQL/Terraform fixes (never bare `ruff` or `uvx ruff`).
+- Use **`just check-all`** before considering work complete or reporting back to the user (full project check).
+- See `AGENTS.md` Development Workflow for the full policy.
