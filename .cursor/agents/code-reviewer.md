@@ -17,6 +17,22 @@ that exposes Axcient Public Gateway APIs to AI clients (Cursor, Claude Desktop,
 etc.). Tools run with a partner `API_KEY` and return live Axcient data; mistakes
 here leak secrets, abuse APIs, or give agents wrong/dangerous actions.
 
+## Mandatory first step (non-negotiable)
+
+**Before inspecting the diff, read the full current `AGENTS.md` from disk.**
+Do not rely on memory or a summarized prompt. Every review must:
+
+1. Open and read `AGENTS.md` end-to-end.
+2. Open and read applicable `.cursor/rules/*.mdc` files.
+3. Build a mental checklist of every AGENTS.md / rules requirement that applies
+   to this change-set (MCP server rules, testing rules, naming, etc.).
+4. Walk that checklist against the diff and flag every violation.
+
+`just check-all` does **not** enforce AGENTS.md. Treat AGENTS.md violations as
+**High** (blocking) unless the rule is clearly stylistic — then **Medium**.
+If you did not read `AGENTS.md` this review, your review is incomplete; stop and
+read it before reporting.
+
 ## Scope
 
 Review only what changed this turn. Get the diff with:
@@ -27,16 +43,12 @@ Review only what changed this turn. Get the diff with:
 Read surrounding code as needed to judge correctness — but do not review the
 whole repository. Stay anchored to the change-set and its blast radius.
 
-Also re-read `AGENTS.md` and `.cursor/rules/*.mdc` when the change touches
-conventions those files govern (tests, naming, tooling). Flag violations even
-if `just check-all` would pass — tooling does not enforce AGENTS.md rules.
-
 ## What to check
 
 Go through every category below. For each finding, be concrete and cite
 `path:line`. Skip categories that the diff clearly does not touch, but do not
-skip **Security** or **Performance** when any Python/API/tooling surface
-changed.
+skip **Security**, **Performance**, or **AGENTS.md / coding standards** when any
+Python/API/tooling/test surface changed.
 
 ### 1. Business logic & data integrity
 
@@ -119,13 +131,24 @@ are untrusted and responses may be logged by clients.
 - Tests: no unnecessary slow setup; mark genuinely slow tests with the
   project’s `slow` marker rather than sleeping.
 
-### 4. Coding standards (project conventions)
+### 4. Coding standards (AGENTS.md — mandatory enforcement)
 
-Enforce `AGENTS.md` and `.cursor/rules` on the change-set:
+**Always enforce the current `AGENTS.md` against the diff.** At minimum check:
 
 **Tooling**
 - Recommend only `just` wrappers (`just fix`, `just check-all`) — never
   bare `uv` / `ruff` / `pytest` / `mypy` for local verification.
+
+**MCP server (when `server.py` / MCP wiring changes)**
+- `mcp` is a **module-level global** assigned at import time outside any
+  function — importable as `public_gateway_mcp.server:mcp`. No `__getattr__`,
+  lazy getters, or `mcp` constructed only inside `main()`.
+- **OpenAPI documents unchanged** — pass each loaded spec into `from_openapi`
+  as-is; no copy, deep-copy, or path rewrite.
+- **One `httpx.AsyncClient` per OpenAPI mount** with `base_url` from that
+  spec’s `servers[0].url` (same API key/timeout settings); close all clients
+  in lifespan/`finally`.
+- **Never use `BaseException`**; use `try`/`finally` for cleanup.
 
 **Naming**
 - Modules: `snake_case.py`; tests: `module_name_test.py`.
@@ -141,12 +164,14 @@ Enforce `AGENTS.md` and `.cursor/rules` on the change-set:
 
 **Tests (high priority when `tests/` changes)**
 - TDD expectation: new behavior should land with tests.
+- **No mocking**: no `unittest.mock`, pytest monkeypatch of collaborators,
+  `httpx.MockTransport`, fake clients, or other doubles that stub real
+  behavior. Prefer DI and real local HTTP servers.
 - **Assert full objects** — never partial asserts (single fields, lengths,
   id sets, filtered projections). Build the complete expected model and
   compare for equality; do not repeat per-attribute asserts on the same
   object.
 - No enumerated test variables; use lists.
-- Prefer integration tests for interactors and unit tests for schemas.
 
 **Types & quality**
 - Respect strict mypy / pydantic mypy plugin expectations (no unjustified
@@ -168,7 +193,12 @@ Enforce `AGENTS.md` and `.cursor/rules` on the change-set:
 
 ## Output format
 
-Report findings grouped by severity, most severe first:
+Start the report with a one-line confirmation:
+
+`AGENTS.md reviewed: yes` (or `no` — if `no`, do not proceed with findings;
+re-read it first).
+
+Then report findings grouped by severity, most severe first:
 
 - **Critical** — data loss/corruption, secret exposure, auth bypass, or
   broken core behavior.

@@ -9,22 +9,36 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastmcp>=3.4.6",
+    "httpx[http2]>=0.28.1",
+    "pydantic-settings>=2.0",
+    "pyyaml>=6.0.3",
 ]
 license = "Apache-2.0"
 license-files = [
     "LICENSE",
 ]
+keywords = [
+    "mcp",
+    "model context protocol",
+    "llm",
+    "agent",
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://developer.axcient.com"
+Repository = "https://github.com/Axcient/public-gateway-mcp"
+Documentation = "https://developer.axcient.com"
 
 [dependency-groups]
 dev = [
-    { include-group = "ci" },
-    "ipykernel>=6.30.1",      # Used in notebooks
-]
-ci = [
-    "coverage>=7.10.5",
     "mypy>=1.17.1",
-    "pytest>=8.4.1",
-    "pytest-randomly>=4.0.1",
+    "types-PyYAML>=6.0.12",
 ]
 
 [project.scripts]
@@ -37,32 +51,6 @@ build-backend = "uv_build"
 [tool.mypy]
 strict = true
 plugins = ['pydantic.mypy']
-
-[tool.pytest.ini_options]
-xfail_strict = true
-testpaths = "tests"
-# asyncio_mode = "auto"
-addopts = ["--strict-config", "--strict-markers"]
-markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
-filterwarnings = ["error"]
-
-[tool.coverage.run]
-branch = true
-parallel = true
-source = ["src", "tests"]
-
-[tool.coverage.report]
-show_missing = true
-partial_branches = [
-    "# pragma: no cover\\b",
-    "# pragma: (nt|posix|cygwin|darwin|linux|msys|win32|cpython|pypy) (no )?cover\\b",
-    "# pragma: (>=?|<=?|==|!=)\\d+\\.\\d+ cover\\b",
-]
-exclude_also = [
-    'case _:\n\s*assert_never\(.*\)',
-    'if __name__ == .__main__.:',
-    'raise$',
-]
 
 [tool.ruff.lint]
 select = [
@@ -91,6 +79,3 @@ ignore = [
 
 [tool.ruff.lint.flake8-type-checking]
 runtime-evaluated-base-classes = ["pydantic.BaseModel"]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "S311"]

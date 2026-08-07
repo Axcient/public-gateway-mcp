@@ -14,7 +14,20 @@ The development workflow follows TDD principles:
 2. **Run `just fix`** to auto-fix linting/formatting issues in case of linting errors
 4. **Run `just check-all`** is the most important command, as always should run this before committing
 
+## MCP server
+
+- **`mcp` must be a module-level global** in `src/public_gateway_mcp/server.py`, assigned at import time outside any function (for example `mcp = build_mcp(...).mcp`). It must be importable by the FastMCP CLI as `public_gateway_mcp.server:mcp`. Do not hide it behind `__getattr__`, lazy getters, or construction only inside `main()`.
+- **OpenAPI documents must be used exactly as loaded.** Pass each document into `FastMCP.from_openapi` unchanged. Do not copy, deep-copy, rewrite paths, or otherwise modify the OpenAPI mapping.
+- **One `httpx.AsyncClient` per OpenAPI mount**: Create a client for each mounted API with `base_url` set from that spec’s `servers[0].url`, using the same API key header and timeout settings. Close every client in lifespan / `finally`. Do not share one client across mounts that have different server URLs.
+- **Never use `BaseException`** (including `except BaseException`). Use `try`/`finally` for cleanup that must run on failure or exit.
+
 ## Testing
+
+- **No mocking**: Do not use `unittest.mock`, `pytest` monkeypatch to replace collaborators, `httpx.MockTransport`, fake clients, or other test doubles that stub out real behavior. Prefer dependency injection (pass OpenAPI documents, HTTP clients, callables) and real local HTTP servers when HTTP is required.
+
+## Code reviews
+
+- Every code review (including the `code-reviewer` subagent) **must read the full current `AGENTS.md` from disk** before judging the diff, then **enforce every applicable rule**. AGENTS.md violations are High/blocking unless clearly stylistic. `just check-all` does not enforce these conventions.
 
 ## Naming Conventions
 

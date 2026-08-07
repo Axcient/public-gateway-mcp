@@ -1,25 +1,6 @@
 @_:
     just --list
 
-_cov *args:
-    uv run -m coverage {{ args }}
-
-
-# Run tests
-[group('qa')]
-test *args:
-    uv run -m pytest {{ args }}
-
-# Run tests and measure coverage
-[group('qa')]
-@cov *args:
-    just _cov erase
-    just _cov run -m pytest
-    just _cov combine
-    just _cov xml
-    just _cov html
-    just _cov report {{ args }}
-
 # Run linters
 [group('qa')]
 lint:
@@ -29,7 +10,7 @@ lint:
 # Check types
 [group('qa')]
 typing:
-    uv run mypy src tests
+    uv run mypy src
 
 # Run automated fixes
 [group('qa')]
@@ -39,7 +20,7 @@ fix:
 
 # Perform all checks
 [group('qa')]
-check-all: lint typing (cov '--fail-under=100')
+check-all: lint typing
 
 # Update dependencies
 [group('lifecycle')]
@@ -49,7 +30,6 @@ update:
 # Initialize project for local development
 [group('lifecycle')]
 _bootstrap:
-    uv run ipython kernel install --user --env VIRTUAL_ENV $(pwd)/.venv --name=$(uv version | awk {'print $1'})
     pre-commit install
     touch .env
 

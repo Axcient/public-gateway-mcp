@@ -8,12 +8,18 @@ alwaysApply: true
 Before declaring any code change complete, you MUST:
 
 1. Read `AGENTS.md` and review every rule against your changes
-2. Specifically verify:
-   - **No raw DB access in tests** — all database operations go through `PostgresInteractor`
+2. Specifically verify (including current MCP / testing rules in AGENTS.md):
+   - **`mcp` is a module-level global** — assigned at import time outside any function; FastMCP CLI-importable
+   - **OpenAPI docs unchanged** — pass loaded specs into `from_openapi` as-is; no copy/deep-copy/path rewrite
+   - **One `httpx.AsyncClient` per OpenAPI mount** — `base_url` from that spec’s `servers[0].url`; close all in lifespan/`finally`
+   - **No `BaseException`** — use `try`/`finally` for cleanup
+   - **No mocking** — no monkeypatch/MockTransport/fake clients; prefer DI + real local HTTP
    - **Assert full objects** — never assert partial responses (single fields, lengths, filtered projections)
-   - **No re-fetching known values** — don't SELECT values the caller already has; add them in Python
-   - **No `time.sleep`** — never add sleep calls anywhere
    - **No enumerated variables** — use lists, not `x1`, `x2`
+   - **No `time.sleep`** — never add sleep calls anywhere
+   - **No raw DB access in tests** — all database operations go through `PostgresInteractor` when DB exists
 3. Only after confirming compliance with ALL rules, report the work as done
 
 If any rule is violated, fix it before reporting completion. Do not rely on `just check-all` alone — it checks tooling (lint, types, coverage) but NOT AGENTS.md conventions.
+
+When a code review runs, the reviewer must also read `AGENTS.md` first and enforce it (see `.cursor/rules/code-review-agents.mdc`).

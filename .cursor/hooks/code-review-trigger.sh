@@ -53,7 +53,7 @@ msg="Code changed this turn. Before ending your turn, delegate to the \`code-rev
 Changed files:
 ${file_list}
 
-Give the reviewer the diff to inspect (\`git diff HEAD\` for tracked edits, plus the contents of any new untracked files). After it reports: fix every Critical/High finding, briefly note Medium/Low ones, then finish. If it reports no issues, say so."
+Give the reviewer the diff to inspect (\`git diff HEAD\` for tracked edits, plus the contents of any new untracked files). Instruct the reviewer that it MUST read the full current \`AGENTS.md\` from disk first and enforce every applicable rule (treat AGENTS.md violations as High/blocking). After it reports: fix every Critical/High finding, briefly note Medium/Low ones, then finish. If it reports no issues, say so."
 
 jq -n --arg m "$msg" '{followup_message: $m}'
 exit 0

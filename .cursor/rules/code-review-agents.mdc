@@ -1,0 +1,21 @@
+---
+description: Code reviews must read and enforce AGENTS.md
+alwaysApply: true
+---
+
+# Code reviews enforce AGENTS.md
+
+Whenever you run or delegate a code review (including the `code-reviewer`
+subagent / Task tool, `/code-reviewer`, or the stop-hook review loop):
+
+1. **Read the full current `AGENTS.md` from disk** before judging the diff.
+   Do not rely on memory or a partial summary.
+2. **Enforce every applicable AGENTS.md rule** on the change-set (MCP server
+   globals, OpenAPI docs passed unchanged, one httpx client per mount, no
+   `BaseException`, no mocking, full-object asserts, naming, `just` tooling,
+   etc.).
+3. Treat AGENTS.md violations as **High / blocking** unless clearly stylistic.
+4. Tell the reviewer (in the Task prompt) to read `AGENTS.md` first and to
+   confirm `AGENTS.md reviewed: yes` in its report.
+5. `just check-all` does **not** replace this — tooling does not enforce
+   AGENTS.md conventions.
