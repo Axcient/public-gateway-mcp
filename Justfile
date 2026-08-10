@@ -39,6 +39,11 @@ install:
     @if ! {{ path_exists(".env") }}; then just _bootstrap; fi
     uv sync
 
+# Run the MCP server
+[group('lifecycle')]
+run:
+    uv run public-gateway-mcp
+
 # Remove temporary files
 [group('lifecycle')]
 clean:
@@ -55,7 +60,7 @@ release bump:
     uv version --bump {{bump}}
     git add pyproject.toml uv.lock
     git commit -m "🔖 $(uv version --short)"
-    git tag v$(uv version --short)
-    git push --tags
+    git tag -a "v$(uv version --short)" -m "v$(uv version --short)"
+    git push --follow-tags
     uv build
     uv publish
