@@ -48,3 +48,14 @@ clean:
 # Recreate project virtualenv from nothing
 [group('lifecycle')]
 fresh: clean install
+
+# Release project
+[group('lifecycle')]
+release bump:
+    uv version --bump {{bump}}
+    git add pyproject.toml uv.lock
+    git commit -m "🔖 $(uv version --short)"
+    git tag v$(uv version --short)
+    git push --tags
+    uv build
+    uv publish
