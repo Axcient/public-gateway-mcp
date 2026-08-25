@@ -1,6 +1,6 @@
 [project]
 name = "public-gateway-mcp"
-version = "0.1.2"
+version = "0.1.3"
 description = "An MCP for ax-public-gateway"
 readme = "README.md"
 authors = [
