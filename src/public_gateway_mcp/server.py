@@ -77,7 +77,7 @@ for namespace, spec in spec_dict.items():
             base_url=spec["servers"][0]["url"],
             headers={
                 "X-Api-Key": settings.api_key,
-                "User-Agent": f"public-gateway-mcp/{__version__}",
+                "User-Agent": f"{__package__}/{__version__}",
             },
             timeout=settings.http_timeout_seconds,
             transport=transport,
