@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlparse
 
-import httpx
+import httpx2
 import pydantic_settings
 import yaml
 from fastmcp import FastMCP
@@ -25,7 +25,7 @@ def server_namespace_from_spec(spec: dict[str, Any]) -> str:
 
 def _load_openapi_spec(
     url: str,
-    client: httpx.Client,
+    client: httpx2.Client,
 ) -> dict[str, Any]:
     response = client.get(url)
     response.raise_for_status()
@@ -36,7 +36,7 @@ def load_openapi_specs(
     urls: "Sequence[str]",
     timeout: float,
 ) -> list[dict[str, Any]]:
-    with httpx.Client(timeout=timeout) as client:
+    with httpx2.Client(timeout=timeout) as client:
         return [_load_openapi_spec(url, client) for url in urls]
 
 
@@ -63,7 +63,7 @@ spec_dict = {
         settings.openapi_timeout_seconds,
     )
 }
-transport = httpx.AsyncHTTPTransport(
+transport = httpx2.AsyncHTTPTransport(
     verify=True,
     trust_env=True,
     http1=False,
@@ -73,7 +73,7 @@ mcp: FastMCP[Any] = FastMCP("Axcient Public APIs", lifespan=lifespan)
 for namespace, spec in spec_dict.items():
     child = FastMCP.from_openapi(
         openapi_spec=spec,
-        client=httpx.AsyncClient(
+        client=httpx2.AsyncClient(
             base_url=spec["servers"][0]["url"],
             headers={
                 "X-Api-Key": settings.api_key,
