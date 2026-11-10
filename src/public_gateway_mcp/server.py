@@ -83,9 +83,6 @@ for namespace, spec in spec_dict.items():
             transport=transport,
         ),
         name=namespace,
-        mcp_names={
-            "get_device_vault_restore_point_by_asio_endpoint_id_org_level": "get_device_vault_restort_point_by_asio"
-        },
     )
     mcp.mount(child, namespace=namespace)
 
